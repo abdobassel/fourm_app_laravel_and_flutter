@@ -15,11 +15,21 @@ class PostController extends Controller
     {
         $posts =  Post::where('user_id', auth()->user()->id)->get();
         $userPosted = auth()->user();
-        return response([
+
+        // Post::with('user')->latest->get;
+
+        if (empty($posts)) {
+            return response()->json([
+
+                'message' => 'There are no posts yet',
+
+            ], 404);
+        }
+        return response()->json([
             'user' => $userPosted,
             'posts' => $posts,
 
-        ]);
+        ], 200);
     }
 
     public function store(PostRequest $request)
