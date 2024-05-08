@@ -82,8 +82,5 @@ class PostController extends Controller
                 'comments' => $comments,
             ]);
         }
-        return response()->json([
-            'message' => 'no comments here',
-        ]);
     }
 }
