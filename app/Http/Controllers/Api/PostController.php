@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Post;
+use App\Models\Comment;
 use Illuminate\Http\Request;
 use App\Http\Requests\PostRequest;
 use App\Http\Controllers\Controller;
@@ -48,5 +49,41 @@ class PostController extends Controller
         return response([
             'message' => 'success', 'post' => $post
         ], 201);
+    }
+
+
+    // comments 
+    public function comment(Request $request, $post_id)
+    {
+        $request->validate([
+            'body' => 'required|min:3',
+        ]);
+        $post = Post::where('id', $post_id)->first();
+        if (!$post) {
+            return response()->json(['message' => 'not found'], 404);
+        }
+
+        $comment = Comment::create([
+            'user_id' => auth()->user()->id,
+            'post_id' => $post_id,
+            'body' => $request->body,
+        ]);
+        if ($comment) {
+            return response()->json(['message' => 'success'], 201);
+        }
+    }
+    // getComments 
+    public function getComments($post_id)
+    {
+
+        $comments = Comment::with('post')->with('user')->wherePostId($post_id)->latest()->get();
+        if ($comments) {
+            return response()->json([
+                'comments' => $comments,
+            ]);
+        }
+        return response()->json([
+            'message' => 'no comments here',
+        ]);
     }
 }
